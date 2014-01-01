@@ -3,6 +3,7 @@ level_label = "Version 4: Bullets and Structure"
 bullets = {}
 
 love.math.setRandomSeed(os.time())
+math.randomseed(os.time())
 
 function distance(point1_x, point1_y, point2_x, point2_y)
     -- get distance of two points
@@ -66,12 +67,12 @@ function fragment(asteroid)
             new_asteroid.image = love.graphics.newImage("resources/asteroid.png")
             new_asteroid.rotation = math.random(360)
             new_asteroid.rotate_speed = math.random() * 100 - 50
-            new_asteroid.width = asteroid.image:getWidth() * 0.5
-            new_asteroid.height = asteroid.image:getHeight() * 0.5
             new_asteroid.velocity_x = love.math.random() * 70 + asteroid.velocity_x
             new_asteroid.velocity_y = love.math.random() * 70 + asteroid.velocity_y
             new_asteroid.dead = false
             new_asteroid.scale = asteroid.scale * 0.5
+            new_asteroid.width = asteroid.image:getWidth() * new_asteroid.scale
+            new_asteroid.height = asteroid.image:getHeight() * new_asteroid.scale
             new_asteroid.is_bullet = false
             table.insert(asteroids, new_asteroid)
         end
