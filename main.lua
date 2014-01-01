@@ -59,7 +59,7 @@ end
 function fragment(asteroid)
     local asteroids = {}
     if asteroid.scale > 0.25 then
-        num_asteroids = love.math.random(2, 3)
+        local num_asteroids = love.math.random(2, 3)
         for i = 1, num_asteroids do
             local new_asteroid = {}
             new_asteroid.x = asteroid.x
