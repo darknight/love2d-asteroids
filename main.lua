@@ -1,6 +1,9 @@
-score_label = "Score: 0"
-level_label = "Version 4: Bullets and Structure"
-bullets = {}
+score_label = "Score: "
+level_label = "Version 5: It's a Game"
+game_over_label = "GAME OVER"
+
+score = 0
+total_asteroids = 3
 
 love.math.setRandomSeed(os.time())
 math.randomseed(os.time())
@@ -121,10 +124,10 @@ function load_player()
 end
 
 function load_player_lives(num_icons)
-    local image = love.graphics.newImage("resources/player.png")
-    local sprite_batch = love.graphics.newSpriteBatch(image, num_icons)
+    local sprite_batch = love.graphics.newSpriteBatch(player_image, 3)
     for i = 1, num_icons do
-        sprite_batch:add(785-(i-1)*30, 15, 0, 0.5, 0.5, image:getWidth() / 2, image:getHeight() / 2, 0, 0)
+        sprite_batch:add(785-(i-1)*30, 15, 0, 0.5, 0.5, player_image:getWidth() / 2,
+                         player_image:getHeight() / 2, 0, 0)
     end
     return sprite_batch
 end
@@ -194,23 +197,39 @@ function update_player(dt)
     end
 end
 
+function reset_level(num_lives)
+    num_lives = num_lives or 2
+    player_ship = load_player()
+    player_lives = load_player_lives(num_lives)
+    asteroids = load_asteroids(total_asteroids, player_ship.x, player_ship.y)
+    bullets = {}
+end
 -----------------------love function-----------------
 
 function love.load()
     main_font = love.graphics.newFont(15)
+    game_over_font = love.graphics.newFont(48)
     love.graphics.setFont(main_font)
-    player_ship = load_player()
-    asteroids = load_asteroids(3, player_ship.x, player_ship.y)
-    player_lives = load_player_lives(2)
     engine_sprite = load_engine_flame()
     bullet_sound = love.audio.newSource("resources/bullet.wav", "static")
+    player_image = love.graphics.newImage("resources/player.png")
+    -- Initialize the game
+    reset_level(2)
 end
 
 function love.draw()
     -- draw label
-    local level_width = main_font:getWidth(level_label)
-    love.graphics.print(score_label, 10, 25)
-    love.graphics.printf(level_label, 400, 25, level_width, "left", 0, 1, 1, level_width / 2, 0, 0, 0)
+    local level_label_width = main_font:getWidth(level_label)
+    love.graphics.print(score_label .. score, 10, 25)
+    love.graphics.printf(level_label, 400, 25, level_label_width,
+                         "left", 0, 1, 1, level_label_width / 2)
+    if player_ship == nil and player_lives:getCount() == 0 then
+        local game_label_width = game_over_font:getWidth(game_over_label)
+        love.graphics.setFont(game_over_font)
+        love.graphics.printf(game_over_label, 400, 300, game_label_width,
+                             "left", 0, 1, 1, game_label_width / 2)
+        love.graphics.setFont(main_font)
+    end
 
     -- draw player ship and engine flame
     if player_ship then
@@ -236,6 +255,11 @@ function love.draw()
     for _, v in ipairs(bullets) do
         love.graphics.draw(v.image, v.x, v.y, 0, 1, 1, v.width / 2, v.height / 2)
     end
+
+    -- draw FPS
+    love.graphics.setFont(game_over_font)
+    love.graphics.print(tostring(love.timer.getFPS()), 10, 550)
+    love.graphics.setFont(main_font)
 end
 
 function love.update(dt)
@@ -290,6 +314,7 @@ function love.update(dt)
             if not v.dead then
                 table.insert(temp_asteroids, v)
             else
+                score = score + 1
                 small_asteroids = fragment(v)
                 for _, v2 in ipairs(small_asteroids) do
                     table.insert(temp_asteroids, v2)
@@ -299,6 +324,21 @@ function love.update(dt)
     end
     asteroids = temp_asteroids
     bullets = temp_bullets
+
+    -- victory judgement
+    local num_lives = player_lives:getCount()
+    if player_ship == nil then
+        -- reset level or game over
+        if num_lives > 0 then
+            reset_level(num_lives - 1)
+        else
+            return
+        end
+    elseif not player_ship.dead and #asteroids == 0 then
+        total_asteroids = total_asteroids + 1
+        score = score + 10
+        reset_level(player_lives:getCount())
+    end
 end
 
 function love.keypressed(key)
