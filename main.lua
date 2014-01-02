@@ -1,3 +1,5 @@
+local util = require("util")
+
 score_label = "Score: "
 level_label = "Version 5: It's a Game"
 game_over_label = "GAME OVER"
@@ -7,15 +9,6 @@ total_asteroids = 3
 
 love.math.setRandomSeed(os.time())
 math.randomseed(os.time())
-
-function distance(point1_x, point1_y, point2_x, point2_y)
-    -- get distance of two points
-    point1_x = point1_x or 0
-    point1_y = point1_y or 0
-    point2_x = point2_x or 0
-    point2_y = point2_y or 0
-    return math.sqrt((point1_x - point2_x) ^ 2 + (point1_y - point2_y) ^ 2)
-end
 
 function check_bounds(obj)
     min_x = -obj.width / 2
@@ -49,7 +42,7 @@ function collide(obj1, obj2)
         return false -- (player, bullet)
     end
     collision_dist = obj1.width / 2 + obj2.width / 2
-    actual_dist = distance(obj1.x, obj1.y, obj2.x, obj2.y)
+    actual_dist = util.distance(obj1.x, obj1.y, obj2.x, obj2.y)
     return actual_dist <= collision_dist
 end
 
@@ -88,7 +81,7 @@ function load_asteroids(num_asteroids, player_x, player_y)
     local asteroids = {}
     for i = 1, num_asteroids do
         local asteroid = { x = player_x, y = player_y }
-        while distance(asteroid.x, asteroid.y, player_x, player_y) < 100 do
+        while util.distance(asteroid.x, asteroid.y, player_x, player_y) < 100 do
             asteroid.x = math.random(800)
             asteroid.y = math.random(600)
         end
