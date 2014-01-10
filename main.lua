@@ -1,6 +1,6 @@
 local util = require("util")
-local Engine = require("engine_class")
-local Player = require("player_class")
+local Engine = require("class_engine")
+local Player = require("class_player")
 
 score_label = "Score: "
 level_label = "Version 5: It's a Game"
