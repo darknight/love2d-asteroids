@@ -1,4 +1,6 @@
 local util = require("util")
+local Engine = require("engine_class")
+local Player = require("player_class")
 
 score_label = "Score: "
 level_label = "Version 5: It's a Game"
@@ -101,19 +103,7 @@ function load_asteroids(num_asteroids, player_x, player_y)
 end
 
 function load_player()
-    local player = {}
-    player.image = love.graphics.newImage("resources/player.png")
-    player.x = 400
-    player.y = 300
-    player.width = player.image:getWidth()
-    player.height = player.image:getHeight()
-    player.velocity_x = 0
-    player.velocity_y = 0
-    player.thrust = 300
-    player.rotate_speed = 200
-    player.rotation = 0
-    player.dead = false
-    return player
+    return Player:new()
 end
 
 function load_player_lives(num_icons)
@@ -126,15 +116,7 @@ function load_player_lives(num_icons)
 end
 
 function load_engine_flame()
-    local engine = {}
-    engine.image = love.graphics.newImage("resources/engine_flame.png")
-    engine.x = 0
-    engine.y = 0
-    engine.rotation = 0
-    engine.visible = false
-    engine.width = engine.image:getWidth()
-    engine.height = engine.image:getHeight()
-    return engine
+    return Engine:new()
 end
 
 function load_bullet()
