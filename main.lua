@@ -1,6 +1,8 @@
 local util = require("util")
 local Engine = require("class_engine")
 local Player = require("class_player")
+local Asteroid = require("class_asteroid")
+local Bullet = require("class_bullet")
 
 score_label = "Score: "
 level_label = "Version 5: It's a Game"
@@ -59,19 +61,14 @@ function fragment(asteroid)
     if asteroid.scale > 0.25 then
         local num_asteroids = love.math.random(2, 3)
         for i = 1, num_asteroids do
-            local new_asteroid = {}
+            local new_asteroid = Asteroid:new()
             new_asteroid.x = asteroid.x
             new_asteroid.y = asteroid.y
-            new_asteroid.image = love.graphics.newImage("resources/asteroid.png")
-            new_asteroid.rotation = math.random(360)
-            new_asteroid.rotate_speed = math.random() * 100 - 50
             new_asteroid.velocity_x = love.math.random() * 70 + asteroid.velocity_x
             new_asteroid.velocity_y = love.math.random() * 70 + asteroid.velocity_y
-            new_asteroid.dead = false
             new_asteroid.scale = asteroid.scale * 0.5
             new_asteroid.width = asteroid.image:getWidth() * new_asteroid.scale
             new_asteroid.height = asteroid.image:getHeight() * new_asteroid.scale
-            new_asteroid.is_bullet = false
             table.insert(asteroids, new_asteroid)
         end
     end
@@ -82,21 +79,11 @@ function load_asteroids(num_asteroids, player_x, player_y)
     -- load asteroid info, keep away from the player
     local asteroids = {}
     for i = 1, num_asteroids do
-        local asteroid = { x = player_x, y = player_y }
+        local asteroid = Asteroid:new{ x = player_x, y = player_y }
         while util.distance(asteroid.x, asteroid.y, player_x, player_y) < 100 do
             asteroid.x = math.random(800)
             asteroid.y = math.random(600)
         end
-        asteroid.image = love.graphics.newImage("resources/asteroid.png")
-        asteroid.rotation = math.random(360)
-        asteroid.rotate_speed = math.random() * 100 - 50
-        asteroid.width = asteroid.image:getWidth()
-        asteroid.height = asteroid.image:getHeight()
-        asteroid.velocity_x = love.math.random() * 40
-        asteroid.velocity_y = love.math.random() * 40
-        asteroid.dead = false
-        asteroid.scale = 1
-        asteroid.is_bullet = false
         table.insert(asteroids, asteroid)
     end
     return asteroids
@@ -120,31 +107,21 @@ function load_engine_flame()
 end
 
 function load_bullet()
-    local bullet = {}
-    bullet.image = love.graphics.newImage("resources/bullet.png")
-    bullet.width = bullet.image:getWidth()
-    bullet.height = bullet.image:getHeight()
-    angle_radians = math.rad(player_ship.rotation)
-    ship_radius = player_ship.width / 2
-    bullet.x = player_ship.x + math.cos(angle_radians) * ship_radius
-    bullet.y = player_ship.y + math.sin(angle_radians) * ship_radius
-    bullet.velocity_x = player_ship.velocity_x + math.cos(angle_radians) * 700
-    bullet.velocity_y = player_ship.velocity_y + math.sin(angle_radians) * 700
-    bullet.dead = false
-    bullet.survival = 0
-    bullet.is_bullet = true
-    return bullet
+    return Bullet:new(player_ship)
 end
 
+--Todo: put it in class asteroid
 function update_asteroid(asteroid, dt)
     update_obj(asteroid, dt)
     asteroid.rotation = asteroid.rotation + asteroid.rotate_speed * dt
 end
 
+--Todo: put it in class bullet
 function update_bullet(bullet, dt)
     update_obj(bullet, dt)
 end
 
+--Todo: put it in class player
 function update_player(dt)
     local player = player_ship
     update_obj(player, dt)
@@ -319,7 +296,7 @@ end
 function love.keypressed(key)
     if key == " " and player_ship and not player_ship.dead then
         local bullet = load_bullet()
-	    table.insert(bullets, bullet)
-	    love.audio.play(bullet_sound)
+      table.insert(bullets, bullet)
+      love.audio.play(bullet_sound)
     end
 end
