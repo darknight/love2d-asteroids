@@ -1,4 +1,4 @@
 love_asteroids
 ==============
 
-a rewrite of asteroids from pyglettutorial using lua and love game engine
+Very simple asteroid game which came from [pyglettutorial](https://github.com/irskep/pyglettutorial).I used lua and [love2d](http://www.love2d.org/) game engine to rewrite it.
