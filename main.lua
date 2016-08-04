@@ -294,7 +294,7 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-    if key == " " and player_ship and not player_ship.dead then
+    if key == "space" and player_ship and not player_ship.dead then
         local bullet = load_bullet()
       table.insert(bullets, bullet)
       love.audio.play(bullet_sound)
